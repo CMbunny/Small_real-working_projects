@@ -54,8 +54,22 @@ dkms.conf
 # debug information files
 *.dwo
 
+# Arduino
+build/
+*.hex
+*.elf
+*.map
+
 # Python
 __pycache__/
 *.py[cod]
+*.pyo
 .env
 venv/
+*.egg-info/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
