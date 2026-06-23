@@ -1,3 +1,47 @@
+## What is Smart Bus?
+
+A three-module Arduino-based safety system for public buses. Each module runs
+independently on its own Arduino Uno and targets a specific safety risk:
+driver fatigue, door hazards, and window safety for children.
+
+---
+
+## How It Works
+
+### Smart Glasses — driver drowsiness detection
+An IR sensor mounted on the driver's glasses monitors eye blink patterns.
+At startup, the sensor calibrates itself by taking 50 baseline readings with
+eyes open. During the journey, if the driver's eyes stay closed longer than
+500ms (beyond a natural blink), the system escalates:
+- 1st event → buzzer only
+- 2nd event within 10 minutes → buzzer + SMS warning
+- 3rd+ event within 10 minutes → continuous alarm + urgent SMS
+
+A watchdog timer reboots the Arduino automatically if the code freezes.
+A 60-second SMS cooldown prevents message spam.
+
+### Smart Door — obstruction detection
+An HC-SR04 ultrasonic sensor is mounted on the door frame. The driver
+presses a physical button to mark the door open at bus stops — this pauses
+all alerts to prevent false alarms. When the door is marked closed, the
+sensor fires a pulse every 200ms. If anything is detected within 20cm
+(someone hanging or climbing), the buzzer activates and an SMS is sent to
+the driver. The alert resets automatically once the obstruction clears.
+
+### Smart Window — child safety
+An HC-SR04 ultrasonic sensor sits on the window frame. If a child leans
+out or an object is thrown within 15cm, a beeping buzzer pattern activates
+immediately. No GSM needed — the alert is for passengers inside the bus.
+The sensor checks every 100ms, faster than the door, since a child leaning
+out is more time-critical.
+
+---
+
+## System Diagram
+
+![Smart Bus System Diagram](assets/smart_bus_diagram.png)
+
+
 # Smart Bus Safety System
 
 A collection of Arduino-based safety modules built as a final year project.
