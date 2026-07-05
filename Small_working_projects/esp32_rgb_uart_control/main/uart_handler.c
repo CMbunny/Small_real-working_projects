@@ -15,7 +15,7 @@
 
 static const char *TAG = "uart_handler";
 
-typedef enum { WAIT_MARKER, READ_R, READ_G, READ_B } parse_state_t;
+typedef enum { WAIT_MARKER, READ_R, READ_G, READ_B, READ_CHECKSUM } parse_state_t;
 
 static void uart_rx_task(void *arg)
 {
@@ -41,12 +41,21 @@ static void uart_rx_task(void *arg)
                 break;
             case READ_B:
                 b = byte;
-                esp_err_t err = led_control_set_rgb(r, g, b);
-                if (err != ESP_OK) {
-                    ESP_LOGE(TAG, "Failed to set RGB (err=%d) - continuing, not restarting", err);
+                state = READ_CHECKSUM;
+                break;
+            case READ_CHECKSUM: {
+                uint8_t expected = r ^ g ^ b;
+                if (byte == expected) {
+                    esp_err_t err = led_control_set_rgb(r, g, b);
+                    if (err != ESP_OK) {
+                        ESP_LOGE(TAG, "Failed to set RGB (err=%d) - continuing, not restarting", err);
+                    }
+                } else {
+                    ESP_LOGW(TAG, "Checksum mismatch (got=0x%02X expected=0x%02X) - frame dropped", byte, expected);
                 }
                 state = WAIT_MARKER;
                 break;
+            }
         }
     }
 }
