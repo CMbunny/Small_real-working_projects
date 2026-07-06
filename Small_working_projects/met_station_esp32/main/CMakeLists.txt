@@ -1,4 +1,12 @@
-cmake_minimum_required(VERSION 3.5)
-
-include($ENV{IDF_PATH}/tools/cmake/project.cmake)
-project(met_station_esp32)
+idf_component_register(
+    SRCS
+        "main.c"
+        "config/wind_sensor.c"
+        "core/current_loop_4_20ma.c"
+        "config/pyranometer.c"
+        "core/modbus_rs485.c"
+    INCLUDE_DIRS
+        "."
+        "core"
+        "config"
+)
