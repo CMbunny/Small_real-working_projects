@@ -53,6 +53,11 @@ static void wind_task(void *arg)
     while (1) {
 
         int adc_raw = cl420_adc_read(adc_handle, WIND_ADC_CHANNEL);
+         if (adc_raw == -1) {
+            ESP_LOGE(TAG, "ADC driver read failed");
+            vTaskDelay(pdMS_TO_TICKS(WIND_TASK_PERIOD_MS));
+            continue;
+        }
         int adc = adc_moving_average(adc_raw);
 
         float voltage = 0.0f;
