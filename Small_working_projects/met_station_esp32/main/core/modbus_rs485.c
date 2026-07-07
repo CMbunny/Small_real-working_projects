@@ -7,7 +7,7 @@
 static const char *TAG = "MODBUS";
 
 static uart_port_t mb_uart;
-static int mb_rts_gpio;
+//static int mb_rts_gpio;
 
 static uint16_t modbus_crc16(const uint8_t *buf, uint16_t len)
 {
@@ -25,7 +25,7 @@ static uint16_t modbus_crc16(const uint8_t *buf, uint16_t len)
 esp_err_t modbus_rs485_init(const modbus_rs485_cfg_t *cfg)
 {
     mb_uart = cfg->uart_port;
-    mb_rts_gpio = cfg->rts_gpio;
+   // mb_rts_gpio = cfg->rts_gpio;
 
     uart_config_t uart_cfg = {
         .baud_rate = cfg->baudrate,
