@@ -5,7 +5,10 @@
 int cl420_adc_read(void *adc_handle, int channel)
 {
     int adc = 0;
-    adc_oneshot_read(adc_handle, channel, &adc);
+    esp_err_t err = adc_oneshot_read(adc_handle, channel, &adc);
+    if (err != ESP_OK) {
+        return -1;   // sentinel: read failed, distinct from a real 0 reading
+    }
     return adc;
 }
 
