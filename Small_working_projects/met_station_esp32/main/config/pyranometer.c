@@ -31,7 +31,13 @@ static void pyranometer_task(void *arg)
 #ifdef PYR_INTERFACE_4_20MA
 
         int adc = cl420_adc_read(adc_handle, PYR_ADC_CHANNEL);
-
+        
+        if (adc == -1) {
+            ESP_LOGE(TAG, "ADC driver read failed");
+            vTaskDelay(pdMS_TO_TICKS(PYR_TASK_PERIOD_MS));
+            continue;
+        }
+        
         float voltage   = 0.0f;
         float current   = 0.0f;
         float radiation = 0.0f;
