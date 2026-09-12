@@ -1,0 +1,80 @@
+# ============================================================
+# Target
+# ============================================================
+CONFIG_IDF_TARGET="esp32s3"
+
+# ============================================================
+# Flash — 8MB
+# ============================================================
+CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y
+CONFIG_ESPTOOLPY_FLASHSIZE="8MB"
+CONFIG_ESPTOOLPY_FLASHMODE_QIO=y
+CONFIG_ESPTOOLPY_FLASHFREQ_80M=y
+
+# ============================================================
+# PSRAM — Octal (matches "esp32s3 octal")
+# ============================================================
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_MODE_OCT=y
+CONFIG_SPIRAM_USE_MALLOC=y
+CONFIG_FREERTOS_TASK_CREATE_ALLOW_EXT_MEM=y
+
+# ============================================================
+# Custom partition table — REQUIRED for OTA
+# See partitions.csv from the OTA extraction. Without this, the
+# build uses ESP-IDF's default single-app partition table, which
+# has no ota_0/ota_1/otadata and OTA cannot work at all.
+# ============================================================
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+
+# ============================================================
+# OTA rollback — CRITICAL, do not remove
+# Without this, esp_ota_mark_app_valid_cancel_rollback() in
+# ota_manager.c is a silent no-op, and a bad flash stays flashed
+# forever instead of auto-reverting on next boot.
+# ============================================================
+CONFIG_BOOTLOADER_APP_ROLLBACK_ENABLE=y
+
+# ============================================================
+# TLS — required for esp_https_ota (OTA downloads over HTTPS)
+# CERTIFICATE_BUNDLE gives you the standard trusted CA list so
+# your OTA server's cert (assuming it's a normal HTTPS host, not
+# self-signed) verifies without you managing a cert file yourself.
+# ============================================================
+CONFIG_MBEDTLS_CERTIFICATE_BUNDLE=y
+CONFIG_MBEDTLS_CERTIFICATE_BUNDLE_DEFAULT_FULL=y
+
+# mbedTLS buffer sizes — defaults are fine for OTA + a plain HTTP
+# server; raise SSL_IN_CONTENT_LEN only if you serve large JSON
+# responses over TLS elsewhere in your project.
+CONFIG_MBEDTLS_SSL_IN_CONTENT_LEN=16384
+CONFIG_MBEDTLS_SSL_OUT_CONTENT_LEN=4096
+
+# Route mbedTLS's larger allocations through PSRAM instead of the
+# ~320KB internal SRAM, which OTA's HTTPS handshake would otherwise
+# compete for against everything else in your firmware.
+CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC=y
+
+# ============================================================
+# HTTP server — for http_ota_trigger.c and http_provision.c
+# ============================================================
+CONFIG_HTTPD_MAX_REQ_HDR_LEN=1024
+CONFIG_HTTPD_MAX_URI_LEN=512
+
+# ============================================================
+# WiFi — no special tuning needed for this minimal project;
+# defaults are fine. Listed here only so you don't need to hunt
+# for what's missing if you add features later.
+# ============================================================
+
+# ============================================================
+# Logging
+# ============================================================
+CONFIG_LOG_DEFAULT_LEVEL_INFO=y
+CONFIG_LOG_DEFAULT_LEVEL=3
+
+# ============================================================
+# Compiler — production build (-O2, not debug -Og)
+# ============================================================
+CONFIG_COMPILER_OPTIMIZATION_PERF=y
